@@ -1,26 +1,107 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --background: #fbf7ee;
+  --foreground: #2d2115;
+  --card-bg: #ffffff;
+  --card-border: #ebdcc9;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Mandi Theme Colors */
+  --mandi-amber: #b8860b;
+  --mandi-amber-dark: #8b5a2b;
+  --mandi-amber-light: #f59e0b;
+  --mandi-cream: #fdf6e3;
+  --mandi-cream-subtle: #faf5eb;
+  --mandi-green: #2f5233;
+  --mandi-green-light: #3f6e45;
+  --mandi-green-dark: #1e3621;
+  --mandi-text: #2d2115;
+  --mandi-text-muted: #7c6853;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f5ebe1;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbb49d;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b8860b;
+}
+
+/* Animation utilities */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 2.5s infinite ease-in-out;
+}
+
+.animate-float {
+  animation: floatGentle 4s infinite ease-in-out;
+}
+
+/* Mandi slip print rules */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #mandi-print-slip,
+  #mandi-print-slip * {
+    visibility: visible;
+  }
+  #mandi-print-slip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
 }
