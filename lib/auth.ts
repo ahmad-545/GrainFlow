@@ -92,10 +92,22 @@ export async function ensureDefaultAdmin(): Promise<IUser> {
     });
     console.log(`Default admin created from .env: ${envEmail}`);
   } else {
-    // If admin exists, ensure email matches .env.local
+    // If admin exists, ensure email and password stay synced with .env.local
+    let shouldSave = false;
     if (admin.email !== envEmail) {
       admin.email = envEmail;
+      shouldSave = true;
+    }
+    const isCurrentPasswordMatching = await verifyPassword(envPassword, admin.passwordHash);
+    if (!isCurrentPasswordMatching) {
+      admin.passwordHash = await hashPassword(envPassword);
+      admin.failedLoginAttempts = 0;
+      admin.lockUntil = null;
+      shouldSave = true;
+    }
+    if (shouldSave) {
       await admin.save();
+      console.log(`Admin user synced from .env.local: ${envEmail}`);
     }
   }
 
