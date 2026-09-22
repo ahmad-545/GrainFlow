@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
-let MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/Grain";
+let MONGODB_URI =
+  process.env.MONGODB_URI ||
+  process.env.MONGO_URI ||
+  "mongodb://127.0.0.1:27017/Grain";
 // On Windows, localhost can sometimes resolve to IPv6 ::1 where MongoDB is bound to IPv4 127.0.0.1
 if (MONGODB_URI.includes("localhost")) {
   MONGODB_URI = MONGODB_URI.replace("localhost", "127.0.0.1");
