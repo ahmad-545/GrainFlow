@@ -1,12 +1,37 @@
 import mongoose from "mongoose";
 
-let MONGODB_URI =
-  process.env.MONGODB_URI ||
-  process.env.MONGO_URI ||
-  "mongodb://127.0.0.1:27017/Grain";
-// On Windows, localhost can sometimes resolve to IPv6 ::1 where MongoDB is bound to IPv4 127.0.0.1
-if (MONGODB_URI.includes("localhost")) {
-  MONGODB_URI = MONGODB_URI.replace("localhost", "127.0.0.1");
+function getSanitizedMongoUri(): string {
+  let raw =
+    process.env.MONGODB_URI ||
+    process.env.MONGO_URI ||
+    "mongodb://127.0.0.1:27017/Grain";
+
+  raw = raw.trim();
+
+  // Strip accidental "MONGODB_URI=" or "MONGO_URI=" prefix if pasted into Vercel value field
+  if (raw.includes("=")) {
+    const idx = raw.indexOf("=");
+    const afterEqual = raw.slice(idx + 1).trim();
+    if (afterEqual.startsWith("mongodb://") || afterEqual.startsWith("mongodb+srv://")) {
+      raw = afterEqual;
+    }
+  }
+
+  // Strip leading and trailing quotes: "..." or '...'
+  raw = raw.replace(/^["']+|["']+$/g, "").trim();
+
+  // Extract mongodb connection string if any stray text exists
+  const match = raw.match(/(mongodb(?:\+srv)?:\/\/[^\s"']+)/);
+  if (match && match[1]) {
+    raw = match[1];
+  }
+
+  // On Windows, localhost can sometimes resolve to IPv6 ::1 where MongoDB is bound to IPv4 127.0.0.1
+  if (raw.includes("localhost")) {
+    raw = raw.replace("localhost", "127.0.0.1");
+  }
+
+  return raw;
 }
 
 interface MongooseCache {
@@ -36,7 +61,8 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
       serverSelectionTimeoutMS: 5000,
     };
 
-    cached!.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
+    const uri = getSanitizedMongoUri();
+    cached!.promise = mongoose.connect(uri, opts).then((mongooseInstance) => {
       console.log(`Connected to MongoDB database: ${mongooseInstance.connection.name}`);
       return mongooseInstance;
     });
